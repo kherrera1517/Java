@@ -9,6 +9,7 @@ public class Minesweeper{
 
     private int secretBoard[][];
     private String playBoard[][];
+    private int winningBoard[][];
 
     public Minesweeper(int rowNum, int colNum, int mineNum){
         this.rowNum = rowNum;
@@ -17,10 +18,14 @@ public class Minesweeper{
 
         this.secretBoard = new int[rowNum][colNum];
         this.playBoard = new String[rowNum][colNum];
+        this.winningBoard = new int[rowNum][colNum];
 
         this.populateSecretBoard(mineNum);
 
         this.populatePlayBoard();
+
+        // this.winningBoard = (this.secretBoard).clone(); MAKES SHALLOW COPY
+        this.populateWinningBoard();
     }
 
     public Minesweeper(int[][] twoDArray, int mineNum){
@@ -30,8 +35,12 @@ public class Minesweeper{
 
         this.secretBoard = twoDArray;
         this.playBoard = new String[this.rowNum][this.colNum];
+        this.winningBoard = new int[this.rowNum][this.colNum];
 
         this.populatePlayBoard();
+
+        // this.winningBoard = (this.secretBoard).clone();
+        this.populateWinningBoard();
     }
 
     public int[][] getSBoard(){
@@ -40,6 +49,10 @@ public class Minesweeper{
 
     public String[][] getPBoard(){
         return this.playBoard;
+    }
+
+    public int[][] getWBoard(){
+        return this.winningBoard;
     }
 
     public int getRowNum(){
@@ -54,6 +67,19 @@ public class Minesweeper{
         for(int i = 0; i < mineNum; i++){
             this.putMinein();
             // this.fillAll();
+        }
+    }
+
+    public void populateWinningBoard(){
+        for(int row = 0; row < this.getRowNum(); row++){
+            for(int col = 0; col < this.getColNum(); col++){
+                if(this.getSBoard()[row][col] != 9){
+                    this.getWBoard()[row][col] = -1;
+                }
+                else{
+                    this.getWBoard()[row][col] = 9;
+                }
+            }
         }
     }
 
@@ -249,22 +275,37 @@ public class Minesweeper{
         return returnArr;
     }
 
-    public static void representBoard(int[][] arr, int rowNum){
-        for(int i = 0; i < rowNum; i++){
+    public static void representBoard(int[][] arr){
+        for(int i = 0; i < arr.length; i++){
             System.out.println(Arrays.toString(arr[i]));
         }
     }
 
-    public static void representBoard(String[][] arr, int rowNum){
-        for(int i = 0; i < rowNum; i++){
-            System.out.println(Arrays.toString(arr[i]));
+    public static void representBoard(String[][] arr){
+        int row = 0;
+        int col = 0;
+        int numRows = arr.length;
+        int numCols = arr[0].length;
+        String cols = "";
+
+        System.out.println("row");
+        for(int i = 0; i < numRows; i++){
+            System.out.println(Integer.toString(i) + "  " + Arrays.toString(arr[i]));
         }
+
+        for(int i = 0; i < numCols; i++){
+            cols += Integer.toString(i) + "  ";
+        }
+        System.out.println("col " + cols);
     }
 
     public boolean reveal(int row, int col){
         // System.out.println("row is " + Integer.toString(row) + " and col is " + Integer.toString(col));
+        if(this.getPBoard()[row][col] == "x"){
+            System.out.println("You've blocked this square. Unblock first!");
+        }
 
-        if(this.getSBoard()[row][col] == 9){
+        else if(this.getSBoard()[row][col] == 9){
             System.out.println("YOU HIT A MINE, BETTER LUCK NEXT TIME!");
             return false;
         }
@@ -275,6 +316,7 @@ public class Minesweeper{
 
         else if(this.getSBoard()[row][col] == 0){
             int[] neighbors = this.getadjNeigh(row, col);
+            // System.out.println("should come in here to update player board");
             this.getPBoard()[row][col] = "o";
             this.getSBoard()[row][col] = -1;
             // representBoard(this.getPBoard(), this.getRowNum());
@@ -331,7 +373,35 @@ public class Minesweeper{
     }
 
     public void block(int row, int col){
-        this.getPBoard()[row][col] = "x";
+        if(this.getSBoard()[row][col] == -1){
+            System.out.println("Cannot block what has already been revealed!");
+        }
+        else{
+            this.getPBoard()[row][col] = "x";
+        }
+    }
+
+    public void unblock(int row, int col){
+        if(this.getPBoard()[row][col] == "x"){
+            this.getPBoard()[row][col] = "-";
+        }
+        else{
+            System.out.println("Cannot unblock what has not been blocked!");
+        }
+    }
+
+    public boolean winner(){
+        for(int row = 0; row < this.getRowNum(); row++){
+            for(int col = 0; col < this.getColNum(); col++){
+                if(this.getSBoard()[row][col] == this.getWBoard()[row][col]){
+                    continue;
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public static void main(String [] args){
@@ -356,36 +426,70 @@ public class Minesweeper{
         int mines = scanner.nextInt();
 
         Minesweeper ms = new Minesweeper(row, col, mines);
+        String string;
 
         while (true){
-            representBoard(ms.getPBoard(), ms.getRowNum());
-            representBoard(ms.getSBoard(), ms.getRowNum());
-            System.out.println("Would you like to reveal or conceal? \nType 'reveal' or 'conceal'.");
-            string = scanner.nextString();
+            representBoard(ms.getPBoard());
+            // representBoard(ms.getSBoard());
+            System.out.println("Would you like to reveal, block or unblock? \nType 'reveal', 'block' or 'unblock'.");
+            string = scanner.next();
+            // System.out.println("string is " + string + " with length " + string.length());
 
-            if(string == 'conceal'){
+            if(string.equals("block")){
+                System.out.println("Pick a row: ");
+                row = scanner.nextInt();
+                System.out.println("Pick a column: ");
+                col = scanner.nextInt();
 
+                ms.block(row, col);
             }
 
-            else if(string == 'reveal'){
+            else if(string.equals("unblock")){
+                System.out.println("Pick a row: ");
+                row = scanner.nextInt();
+                System.out.println("Pick a column: ");
+                col = scanner.nextInt();
 
+                ms.unblock(row, col);
+            }
+
+
+            else if(string.equals("reveal")){
+                System.out.println("Pick a row: ");
+                row = scanner.nextInt();
+                System.out.println("Pick a column: ");
+                col = scanner.nextInt();
+
+                if( ms.reveal(row, col) ){
+                    // representBoard(ms.getWBoard());
+                    // representBoard(ms.getSBoard());
+                    if( ms.winner() ){
+                        System.out.println("YOU WON!");
+                        representBoard(ms.getPBoard());
+                        break;
+                    }
+                    continue;
+                }
+                else{
+                    break;
+                }
             }
 
             else{
                 System.out.println("Please input valid option!");
                 continue;
             }
-            System.out.println("Pick a row: ");
-            row = scanner.nextInt();
-            System.out.println("Pick a column: ");
-            col = scanner.nextInt();
+            // System.out.println("Pick a row: ");
+            // row = scanner.nextInt();
+            // System.out.println("Pick a column: ");
+            // col = scanner.nextInt();
 
-            if( ms.reveal(row, col) ){
-                continue;
-            }
-            else{
-                break;
-            }
+            // if( ms.reveal(row, col) ){
+            //     continue;
+            // }
+            // else{
+            //     break;
+            // }
 
         }
     //     int[][] arr = new int[][]{
