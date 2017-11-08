@@ -435,31 +435,31 @@ public class Minesweeper{
             string = scanner.next();
             // System.out.println("string is " + string + " with length " + string.length());
 
-            if(string.equals("block")){
-                System.out.println("Pick a row: ");
-                row = scanner.nextInt();
-                System.out.println("Pick a column: ");
-                col = scanner.nextInt();
+            System.out.println("Pick a row: ");
+            row = scanner.nextInt();
+            System.out.println("Pick a column: ");
+            col = scanner.nextInt();
 
+            if( (row > ms.getRowNum()-1) || (col > ms.getColNum()-1)){
+                System.out.println("That number lies outside the grid!");
+                try{
+                    Thread.sleep(3000);
+                }
+                catch (Exception e){
+                    System.out.println(e);
+                }
+            }
+
+            else if(string.equals("block")){
                 ms.block(row, col);
             }
 
             else if(string.equals("unblock")){
-                System.out.println("Pick a row: ");
-                row = scanner.nextInt();
-                System.out.println("Pick a column: ");
-                col = scanner.nextInt();
-
                 ms.unblock(row, col);
             }
 
 
             else if(string.equals("reveal")){
-                System.out.println("Pick a row: ");
-                row = scanner.nextInt();
-                System.out.println("Pick a column: ");
-                col = scanner.nextInt();
-
                 if( ms.reveal(row, col) ){
                     // representBoard(ms.getWBoard());
                     // representBoard(ms.getSBoard());
@@ -476,7 +476,13 @@ public class Minesweeper{
             }
 
             else{
-                System.out.println("Please input valid option!");
+                System.out.println("You chose to " + string + " which is not a valid option. Please input valid option!");
+                try{
+                    Thread.sleep(3000);
+                }
+                catch (Exception e){
+                    System.out.println(e);
+                }
                 continue;
             }
             // System.out.println("Pick a row: ");
