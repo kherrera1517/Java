@@ -121,7 +121,7 @@ public class Minesweeper{
             if(this.getSBoard()[randRow][randCol] != 9){
                 //System.out.println("row is " + randRow + " and col is " + randCol);
                 this.getSBoard()[randRow][randCol] = 9;
-                System.out.println("random row and random col are " + randRow + " " + randCol);
+                // System.out.println("random row and random col are " + randRow + " " + randCol);
                 int[] neighbors = this.getadjNeigh(randRow, randCol);
 
                 for(int i = 0; i < 8; i++){
@@ -288,7 +288,7 @@ public class Minesweeper{
         int numCols = arr[0].length;
         String cols = "";
 
-        System.out.println("row");
+        System.out.println("\nrow");
         for(int i = 0; i < numRows; i++){
             System.out.println(Integer.toString(i) + "  " + Arrays.toString(arr[i]));
         }
@@ -296,7 +296,7 @@ public class Minesweeper{
         for(int i = 0; i < numCols; i++){
             cols += Integer.toString(i) + "  ";
         }
-        System.out.println("col " + cols);
+        System.out.println("col " + cols + "\n");
     }
 
     public boolean reveal(int row, int col){
